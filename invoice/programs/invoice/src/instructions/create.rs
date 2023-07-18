@@ -20,7 +20,7 @@ pub struct Create<'info> {
     #[account(
         init, 
         payer = authority, 
-        space = Invoice::get_space(0), 
+        space = Invoice::get_space(0, false), 
         seeds = [
             INVOICE_SEED.as_ref(),
             &(invoice_id).to_le_bytes()

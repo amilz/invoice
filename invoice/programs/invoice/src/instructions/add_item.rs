@@ -23,7 +23,10 @@ pub struct AddItem<'info> {
             INVOICE_SEED.as_ref(),
             // TODO @Aaron time permitting change & test this from a parameter to using invoice.id
             &(invoice.id).to_le_bytes()
-            ], 
+            ],
+        realloc = Invoice::get_space(invoice.line_items.len() + 1, false),
+        realloc::payer = authority,
+        realloc::zero = false,
         bump = invoice.bump
     )]
     pub invoice: Account<'info, Invoice>,

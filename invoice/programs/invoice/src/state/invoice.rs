@@ -15,26 +15,35 @@ pub struct Invoice {
     pub paid: bool, // TODO @Aaron TIME PERMITTING - make this an amount that can be updated (eg partial payments)
     pub state: InvoiceState,
     pub description: String, // TODO @Aaron TIME PERMITTING - make this a Vec of line items
+    pub cancellation_reason: Option<String>, 
 }
 
 impl Invoice {
     pub const MAX_MEMO_LENGTH: usize = 100;
     pub const MAX_NUM_LINES: usize = 10;
-    pub fn get_space(num_line_items: usize) -> usize {
-        8 + // discriminator
-        8 + // id
-        1 + // bump
-        32 + // creator
-        32 + // payer
-        32 + // payee
-        8 + // created_at
-        8 + // due
-        4 + (LineItem::get_space() * num_line_items) + // Can I use Invoice::line_items.len()
-        8 + // total_amount
-        1 + // paid
-        1 + 8 + // state // TODO @Aaron check space for enum https://book.anchor-lang.com/anchor_references/space.html
-        4 + Self::MAX_MEMO_LENGTH // description // TODO @Aaron make dynamic
+    pub fn get_space(num_line_items: usize, cancelled: bool) -> usize {
+        let mut space = 
+            8 + // discriminator
+            8 + // id
+            1 + // bump
+            32 + // creator
+            32 + // payer
+            32 + // payee
+            8 + // created_at
+            8 + // due
+            4 + (LineItem::get_space() * num_line_items) + // Can I use Invoice::line_items.len()
+            8 + // total_amount
+            1 + // paid
+            1 + 8 + // state // TODO @Aaron check space for enum https://book.anchor-lang.com/anchor_references/space.html
+            4 + Self::MAX_MEMO_LENGTH; // description // TODO @Aaron make dynamic
+    
+        if cancelled {
+            space += 100;
+        }
+    
+        space
     }
+    
     pub fn initialize(
         &mut self,
         auth: Pubkey,
