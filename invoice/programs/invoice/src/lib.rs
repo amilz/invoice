@@ -16,8 +16,12 @@ pub mod invoice {
         instructions::create(ctx, invoice_id, description)
     }
     
-    pub fn add_item(ctx: Context<AddItem>, invoice_id: u64, params: AddItemParams) -> Result<()> {
-        instructions::add_item(ctx, invoice_id, params)
+    pub fn add_item(ctx: Context<AddItem>, params: AddItemParams) -> Result<()> {
+        instructions::add_item(ctx, params)
+    }
+
+    pub fn send_invoice(ctx: Context<SendInvoice>) -> Result<()> {
+        instructions::send_invoice(ctx)
     }
 }
 

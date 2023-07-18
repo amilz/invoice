@@ -10,4 +10,6 @@ pub enum InvoiceError {
     TooManyLineItems,
     #[msg("Item name is limited to 20 char")]
     ItemNameTooLong,
+    #[msg("Invoice already sent")]
+    InvoiceAlreadySent
 }

@@ -2,12 +2,12 @@ use std::str::FromStr;
 
 use anchor_lang::prelude::*;
 use crate::model::InvoiceError;
-use crate::state::{Invoice, AddItemParams, LineItem, InvoiceState};
+use crate::state::{Invoice, InvoiceState};
 use crate::constants::{AUTHORITY, INVOICE_SEED};
 
 #[derive(Accounts)]
 #[instruction()]
-pub struct AddItem<'info> {
+pub struct SendInvoice<'info> {
     // For now, let's restrict to a certain authority
     // In the future, we can make this more flexible
     #[account(
@@ -21,7 +21,6 @@ pub struct AddItem<'info> {
         mut, 
         seeds = [
             INVOICE_SEED.as_ref(),
-            // TODO @Aaron time permitting change & test this from a parameter to using invoice.id
             &(invoice.id).to_le_bytes()
             ], 
         bump = invoice.bump
@@ -32,15 +31,14 @@ pub struct AddItem<'info> {
 }
 
 
-pub fn add_item(ctx: Context<AddItem>, params: AddItemParams) -> Result<()> {
+pub fn send_invoice(ctx: Context<SendInvoice>) -> Result<()> {
     let invoice = &mut ctx.accounts.invoice;
 
     // TODO @Aaron - incorporate require into .validate
-    require!(params.item.len() <= LineItem::MAX_ITEM_LENGTH, InvoiceError::DescriptionTooLong);    
     require!(invoice.line_items.len() + 1 < Invoice::MAX_NUM_LINES, InvoiceError::TooManyLineItems);
     require!(invoice.state == InvoiceState::Unsent, InvoiceError::InvoiceAlreadySent);
 
-    invoice.add_item(params);
+    invoice.send_invoice();
     
     Ok(())
 }

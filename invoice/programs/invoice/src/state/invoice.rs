@@ -8,8 +8,9 @@ pub struct Invoice {
     pub creator: Pubkey,
     pub payer: Pubkey,
     pub payee: Pubkey, // for now this will be same as creator but in the future we can make this more flexible
+    pub total_amount: u64,
     pub created_at: i64,
-    pub due: u64,
+    pub due: i64,
     pub line_items: Vec<LineItem>,
     pub paid: bool, // TODO @Aaron TIME PERMITTING - make this a value that can be updated
     pub state: InvoiceState,
@@ -29,7 +30,7 @@ impl Invoice {
         8 + // created_at
         8 + // due
         4 + (LineItem::get_space() * num_line_items) + // Can I use Invoice::line_items.len()
-        8 + // amount
+        8 + // total_amount
         1 + // paid
         1 + 8 + // state // TODO @Aaron check space for enum https://book.anchor-lang.com/anchor_references/space.html
         4 + Self::MAX_MEMO_LENGTH // description // TODO @Aaron make dynamic
@@ -53,6 +54,7 @@ impl Invoice {
         self.description = description;
         self.bump = bump;
         self.id = invoice_id;
+        self.total_amount = 0;
     }
 
     pub fn add_item(&mut self, items: AddItemParams) {
@@ -63,9 +65,17 @@ impl Invoice {
         };
         self.line_items.push(line_item);
     }
+    pub fn send_invoice(&mut self) {
+        self.state = InvoiceState::Unpaid;
+        self.total_amount = self.line_items.iter().fold(0, |acc, item| {
+            acc + item.calculate_total()
+        });
+        self.due = Clock::get().unwrap().unix_timestamp + 60 * 60 * 24 * 30; // 30 days from now
+
+    }
 }
 
-#[derive(AnchorSerialize, AnchorDeserialize, Debug, Clone)]
+#[derive(AnchorSerialize, AnchorDeserialize, Debug, Clone, PartialEq)]
 pub enum InvoiceState {
     Unsent,
     Unpaid,
@@ -90,7 +100,7 @@ impl LineItem {
         1 + // qty (u8)
         8 // unit_cost (u64)
     }
-    pub fn calculate_total(self) -> u64 {
+    pub fn calculate_total(&self) -> u64 {
         self.qty as u64 * self.unit_cost
     }
 }
