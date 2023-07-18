@@ -1,9 +1,9 @@
 use anchor_lang::prelude::*;
-use solana_program::{pubkey::Pubkey};
+use solana_program::pubkey::Pubkey;
 
 #[account]
 pub struct Invoice {
-    pub id: u64, 
+    pub id: u64,
     pub bump: u8,
     pub creator: Pubkey,
     pub payer: Pubkey,
@@ -16,9 +16,8 @@ pub struct Invoice {
     pub description: String, // TODO @Aaron TIME PERMITTING - make this a Vec of line items
 }
 
-
 impl Invoice {
-    pub const MAX_MEMO_LENGTH:usize = 100;
+    pub const MAX_MEMO_LENGTH: usize = 100;
     pub const MAX_NUM_LINES: usize = 10;
     pub fn get_space(num_line_items: usize) -> usize {
         8 + // discriminator
@@ -36,12 +35,12 @@ impl Invoice {
         4 + Self::MAX_MEMO_LENGTH // description // TODO @Aaron make dynamic
     }
     pub fn initialize(
-        &mut self, 
-        auth: Pubkey, 
-        payer: Pubkey, 
-        bump: u8, 
+        &mut self,
+        auth: Pubkey,
+        payer: Pubkey,
+        bump: u8,
         invoice_id: u64,
-        description: String
+        description: String,
     ) {
         self.creator = auth;
         self.payer = payer;
@@ -56,7 +55,14 @@ impl Invoice {
         self.id = invoice_id;
     }
 
-    
+    pub fn add_item(&mut self, items: AddItemParams) {
+        let line_item = LineItem {
+            qty: items.qty,
+            unit_cost: items.cost,
+            item: items.item,
+        };
+        self.line_items.push(line_item);
+    }
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Debug, Clone)]
@@ -71,19 +77,27 @@ pub enum InvoiceState {
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Default)]
 pub struct LineItem {
+    // Future state--could create a standard products list
     pub item: String, // Max 20 char
-    pub qty: u8, 
-    pub unit_cost: u64,    
+    pub qty: u8,
+    pub unit_cost: u64,
 }
 
 impl LineItem {
-    const MAX_ITEM_LENGTH:usize = 20;
+    pub const MAX_ITEM_LENGTH: usize = 20;
     pub fn get_space() -> usize {
         4 + Self::MAX_ITEM_LENGTH + // item (String)
         1 + // qty (u8)
         8 // unit_cost (u64)
     }
-    pub fn calculate_total(self) -> u64 {        
-        self.qty as u64 * self.unit_cost 
+    pub fn calculate_total(self) -> u64 {
+        self.qty as u64 * self.unit_cost
     }
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Debug, Clone)]
+pub struct AddItemParams {
+    pub qty: u8,
+    pub cost: u64,
+    pub item: String,
 }

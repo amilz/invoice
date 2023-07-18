@@ -17,7 +17,7 @@ function numberBuffer(value: bigint): Uint8Array {
 export const INVOICE_SEED = Buffer.from("invoice");
 
 export const getInvoicePda = async (invoiceId: number, program: PublicKey) => {
-    const [invoicePda, _raffleBump] = await PublicKey.findProgramAddressSync(
+    const [invoicePda, _invoiceBump] = await PublicKey.findProgramAddressSync(
         [INVOICE_SEED, numberBuffer(BigInt(invoiceId))],
         program
     );

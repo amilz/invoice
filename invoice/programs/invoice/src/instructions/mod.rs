@@ -1,6 +1,8 @@
 pub mod create;
 pub use create::*;
 
+pub mod add_item;
+pub use add_item::*;
 /*
 
 Instructions:
