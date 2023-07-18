@@ -118,7 +118,6 @@ describe("invoice", async () => {
     tx.lastValidBlockHeight = lastValidBlockHeight;
     const txId = await anchor.web3.sendAndConfirmTransaction(connection, tx, [AUTH_KEYPAIR], { commitment: "finalized" });
     const invoice = await program.account.invoice.fetch(invoicePda);
-      console.log('id:',invoice.id);
     expect (invoice.paid).equal(true);
 
     // TODO @Aaron Time permitting add more tests (e.g. calc the price)
@@ -190,7 +189,6 @@ describe("invoice", async () => {
     tx.lastValidBlockHeight = lastValidBlockHeight;
     const txId = await anchor.web3.sendAndConfirmTransaction(connection, tx, [AUTH_KEYPAIR], { commitment: "finalized" });
     const invoice = await program.account.invoice.fetch(invoicePda);
-    console.log(invoice);
     expect (invoice.cancellationReason).equal(reason);
     // TODO @Aaron Time permitting add more tests (e.g. enum state from IDL)
   });

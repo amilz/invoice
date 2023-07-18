@@ -1,5 +1,16 @@
 Description: create a system for creating and processing invoices.
 
+## Setup
+
+Fork repo
+Create a AUTH wallet using `solana keygen`
+Update the `constants.rs` with that AUTH
+Update tests with that AUTH
+Make sure network set to localnet 
+`anchor test`
+
+## Notes
+
 Create_invoice
 - line item
 - customer
