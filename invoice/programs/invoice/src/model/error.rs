@@ -11,5 +11,7 @@ pub enum InvoiceError {
     #[msg("Item name is limited to 20 char")]
     ItemNameTooLong,
     #[msg("Invoice already sent")]
-    InvoiceAlreadySent
+    InvoiceAlreadySent,
+    #[msg("Trying to pay an invoice that is not outstanding")]
+    InvoiceNotOutstanding,
 }

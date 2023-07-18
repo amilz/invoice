@@ -7,6 +7,9 @@ pub use add_item::*;
 pub mod send_invoice;
 pub use send_invoice::*;
 
+pub mod process_payment;
+pub use process_payment::*;
+
 /*
 
 Instructions:

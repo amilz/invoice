@@ -7,7 +7,7 @@ use crate::constants::{AUTHORITY, INVOICE_SEED};
 
 #[derive(Accounts)]
 #[instruction()]
-pub struct SendInvoice<'info> {
+pub struct ProcessPayment<'info> {
     // For now, let's restrict to a certain authority
     // In the future, we can make this more flexible
     #[account(
@@ -31,13 +31,13 @@ pub struct SendInvoice<'info> {
 }
 
 
-pub fn send_invoice(ctx: Context<SendInvoice>) -> Result<()> {
+pub fn process_payment(ctx: Context<ProcessPayment>) -> Result<()> {
     let invoice = &mut ctx.accounts.invoice;
 
     // TODO @Aaron - incorporate require into .validate
-    require!(invoice.state == InvoiceState::Unsent, InvoiceError::InvoiceAlreadySent);
+    require!(invoice.state == InvoiceState::Unpaid, InvoiceError::InvoiceNotOutstanding);
 
-    invoice.send_invoice();
+    invoice.pay_invoice();
     
     Ok(())
 }

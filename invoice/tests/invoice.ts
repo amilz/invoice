@@ -102,5 +102,27 @@ describe("invoice", async () => {
 
     // TODO @Aaron Time permitting add more tests (e.g. calc the price)
   });
+  it("It processes a payment!", async () => {
+    const invoicePda = await getInvoicePda(1, program.programId);
+
+    const tx = await program.methods.processPayment()
+      .accounts({
+        authority: AUTH_KEYPAIR.publicKey,
+        invoice: invoicePda,
+      })
+      .signers([AUTH_KEYPAIR])
+      .transaction();
+    let { lastValidBlockHeight, blockhash } = await connection.getLatestBlockhash();
+    tx.feePayer = AUTH_KEYPAIR.publicKey;
+    tx.recentBlockhash = blockhash;
+    tx.lastValidBlockHeight = lastValidBlockHeight;
+    const txId = await anchor.web3.sendAndConfirmTransaction(connection, tx, [AUTH_KEYPAIR], { commitment: "finalized" });
+    const invoice = await program.account.invoice.fetch(invoicePda);
+
+    expect (invoice.paid).equal(true);
+
+    // TODO @Aaron Time permitting add more tests (e.g. calc the price)
+  });
+
 
 });

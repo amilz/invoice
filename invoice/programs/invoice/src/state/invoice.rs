@@ -12,7 +12,7 @@ pub struct Invoice {
     pub created_at: i64,
     pub due: i64,
     pub line_items: Vec<LineItem>,
-    pub paid: bool, // TODO @Aaron TIME PERMITTING - make this a value that can be updated
+    pub paid: bool, // TODO @Aaron TIME PERMITTING - make this an amount that can be updated (eg partial payments)
     pub state: InvoiceState,
     pub description: String, // TODO @Aaron TIME PERMITTING - make this a Vec of line items
 }
@@ -71,7 +71,14 @@ impl Invoice {
             acc + item.calculate_total()
         });
         self.due = Clock::get().unwrap().unix_timestamp + 60 * 60 * 24 * 30; // 30 days from now
-
+    }
+    pub fn pay_invoice(&mut self) {
+        self.state = InvoiceState::Paid;
+        self.paid = true;
+        // TODO Future: 
+        // enable handling of SPL token payments to automate this (rather than a auth signature)
+        // currently assuming the authorized user has received some off-chain payment and are using this to settle the invoice
+        // Need to add a pentalty for late payments
     }
 }
 

@@ -23,6 +23,10 @@ pub mod invoice {
     pub fn send_invoice(ctx: Context<SendInvoice>) -> Result<()> {
         instructions::send_invoice(ctx)
     }
+
+    pub fn process_payment(ctx: Context<ProcessPayment>) -> Result<()> {
+        instructions::process_payment(ctx)
+    }
 }
 
 #[derive(Accounts)]
