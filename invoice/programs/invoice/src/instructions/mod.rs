@@ -10,12 +10,5 @@ pub use send_invoice::*;
 pub mod process_payment;
 pub use process_payment::*;
 
-/*
-
-Instructions:
-X create invoice
-X add item
-X send invoice
-- pay invoice
-
- */
+pub mod cancel_invoice;
+pub use cancel_invoice::*;

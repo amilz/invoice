@@ -89,6 +89,10 @@ impl Invoice {
         // currently assuming the authorized user has received some off-chain payment and are using this to settle the invoice
         // Need to add a pentalty for late payments
     }
+    pub fn cancel_invoice(&mut self, reason: String) {
+        self.state = InvoiceState::Cancelled;
+        self.cancellation_reason = Some(reason);
+    }
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Debug, Clone, PartialEq)]

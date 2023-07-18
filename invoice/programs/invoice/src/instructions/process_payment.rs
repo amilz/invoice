@@ -6,7 +6,6 @@ use crate::state::{Invoice, InvoiceState};
 use crate::constants::{AUTHORITY, INVOICE_SEED};
 
 #[derive(Accounts)]
-#[instruction()]
 pub struct ProcessPayment<'info> {
     // For now, let's restrict to a certain authority
     // In the future, we can make this more flexible
